@@ -4,6 +4,7 @@ from tabletop import *
 @Session.model_mixin
 class Attendee:
     games  = relationship('Game', backref='attendee')
+    checkouts = relationship('Checkout', backref='attendee')
 
 
 class Game(MagModel):
