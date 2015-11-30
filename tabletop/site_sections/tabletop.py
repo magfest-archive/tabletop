@@ -15,7 +15,7 @@ class Root:
 
     @ajax
     def add_game(self, session, code, name, attendee_id):
-        session.add(Game(code=code, name=name, attendee_id=attendee_id))
+        session.add(TabletopGame(code=code, name=name, attendee_id=attendee_id))
         session.commit()
         return {
             'message': 'Success!',
@@ -24,7 +24,7 @@ class Root:
 
     @ajax
     def checkout(self, session, game_id, attendee_id):
-        session.add(Checkout(game_id=game_id, attendee_id=attendee_id))
+        session.add(TabletopCheckout(game_id=game_id, attendee_id=attendee_id))
         session.commit()
         return {
             'message': 'Success!',
@@ -34,7 +34,7 @@ class Root:
     @ajax
     def returned(self, session, game_id):
         try:
-            session.game(game_id).checked_out.returned = localized_now()
+            session.tabletop_game(game_id).checked_out.returned = localized_now()
             session.commit()
         except:
             pass
@@ -45,7 +45,7 @@ class Root:
 
     @ajax
     def return_to_owner(self, session, game_id):
-        session.game(game_id).returned = True
+        session.tabletop_game(game_id).returned = True
         session.commit()
         return {
             'message': 'Success!',
@@ -87,4 +87,4 @@ def _games(session):
         'attendee_id': g.attendee_id,
         'attendee': _attendee(g.attendee),
         'checked_out': _checked_out(g.checked_out)
-    } for g in session.query(Game).options(joinedload(Game.attendee)).order_by(Game.name).all()]
+    } for g in session.query(TabletopGame).options(joinedload(TabletopGame.attendee)).order_by(TabletopGame.name).all()]

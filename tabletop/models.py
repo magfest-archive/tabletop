@@ -3,16 +3,16 @@ from tabletop import *
 
 @Session.model_mixin
 class Attendee:
-    games  = relationship('Game', backref='attendee')
-    checkouts = relationship('Checkout', backref='attendee')
+    games  = relationship('TabletopGame', backref='attendee')
+    checkouts = relationship('TabletopCheckout', backref='attendee')
 
 
-class Game(MagModel):
+class TabletopGame(MagModel):
     code        = Column(UnicodeText)
     name        = Column(UnicodeText)
     attendee_id = Column(UUID, ForeignKey('attendee.id'))
     returned    = Column(Boolean, default=False)
-    checkouts   = relationship('Checkout', backref='game')
+    checkouts   = relationship('TabletopCheckout', backref='game')
 
     _repr_attr_names = ['name']
 
@@ -24,8 +24,8 @@ class Game(MagModel):
             pass
 
 
-class Checkout(MagModel):
-    game_id     = Column(UUID, ForeignKey('game.id'))
+class TabletopCheckout(MagModel):
+    game_id     = Column(UUID, ForeignKey('tabletop_game.id'))
     attendee_id = Column(UUID, ForeignKey('attendee.id'))
     checked_out = Column(UTCDateTime, default=lambda: datetime.now(UTC))
     returned    = Column(UTCDateTime, nullable=True)
