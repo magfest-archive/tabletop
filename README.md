@@ -1,2 +1,2 @@
-# hotel
+# tabletop
 MAGFest tabletop checkins
