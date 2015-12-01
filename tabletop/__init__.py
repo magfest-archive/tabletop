@@ -1,6 +1,6 @@
 from uber.common import *
 from tabletop._version import __version__
-tabletop_config = parse_config(__file__)
+from tabletop.config import *
 from tabletop.models import *
 
 static_overrides(join(tabletop_config['module_root'], 'static'))
