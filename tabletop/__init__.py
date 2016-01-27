@@ -1,3 +1,5 @@
+from sqlalchemy.orm import subqueryload
+
 from uber.common import *
 from tabletop._version import __version__
 from tabletop.config import *

@@ -1,0 +1,38 @@
+<h2>Tabletop Tournaments</h2>
+
+<a style="display:block ; text-align:center" href="#/add-tournament">Add a tournament</a>
+
+<h4>Tournaments</h4>
+
+<table>
+    <tbody>
+        <tr ng-repeat="tournament in tournaments">
+            <td>
+                <b>{{ tournament.name }}</b>
+                <br/> <br>
+                <b>{{ tournament.entrants.length }}</b> entrants
+                <ol>
+                    <li ng-repeat="entrant in tournament.entrants">
+                        {{ entrant.name }} (Badge #{{ entrant.badge }})
+                    </li>
+                </ol>
+            </td>
+            <td>
+                Add an attendee:
+                <input type="text" ng-model="attendee" typeahead-editable="false"
+                       typeahead="a as (a.name + ' (Badge #' + a.badge + ')') for a in attendees | filter | limitTo:8" />
+            </td>
+            <td>
+                <span ng-if="attendee">
+                    Attendee Cellphone:
+                    <input type="text" ng-model="attendee.cellphone" />
+                </span>
+            </td>
+            <td><button ng-if="attendee.cellphone" ng-click="signUp(tournament, attendee)">Add to Tournament</button></td>
+        </tr>
+    </tbody>
+</table>
+
+<table>
+</table>
+

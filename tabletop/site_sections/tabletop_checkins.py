@@ -9,7 +9,7 @@ class Root:
             'attendees': _attendees(session)
         }
 
-    @ajax
+    @ajax_gettable
     def badged_attendees(self, session):
         return _attendees(session)
 
@@ -87,4 +87,7 @@ def _games(session):
         'attendee_id': g.attendee_id,
         'attendee': _attendee(g.attendee),
         'checked_out': _checked_out(g.checked_out)
-    } for g in session.query(TabletopGame).options(joinedload(TabletopGame.attendee)).order_by(TabletopGame.name).all()]
+    } for g in session.query(TabletopGame)
+                      .options(joinedload(TabletopGame.attendee),
+                               subqueryload(TabletopGame.checkouts))
+                      .order_by(TabletopGame.name).all()]

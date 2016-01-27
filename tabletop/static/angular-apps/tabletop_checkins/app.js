@@ -1,8 +1,8 @@
-angular.module('tabletop', ['ngRoute', 'magfest', 'ui.bootstrap'])
+angular.module('tabletop.checkins', ['ngRoute', 'magfest', 'ui.bootstrap'])
     .config(function ($routeProvider){
         $routeProvider
-            .when('/', {controller: 'GameListController', templateUrl: '../static/angular-apps/tabletop/game_list.html'})
-            .when('/form', {controller: 'GameFormController', templateUrl: '../static/angular-apps/tabletop/form.html'})
+            .when('/', {controller: 'GameListController', templateUrl: '../static/angular-apps/tabletop_checkins/game_list.html'})
+            .when('/form', {controller: 'GameFormController', templateUrl: '../static/angular-apps/tabletop_checkins/form.html'})
             .otherwise({redirectTo: '/'});
     })
     .directive('attendeeLink', function () {
