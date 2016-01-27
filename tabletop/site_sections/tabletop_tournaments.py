@@ -40,7 +40,6 @@ class Root:
             }
 
 
-
 def _state(session):
     return {
         'events': _events(session),
