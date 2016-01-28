@@ -1,0 +1,2 @@
+twilio==5.2.0
+phonenumbers==7.2.3
