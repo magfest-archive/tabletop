@@ -72,11 +72,11 @@ class TabletopEntrant(MagModel):
     def should_send_reminder(self):
         return not self.reminder \
            and localized_now() < self.tournament.event.start_time \
-           and localized_now() > self.tournament.event.start_time - timedelta(minutes=c.TABLETOP_REMINDER_MINUTES)
+           and localized_now() > self.tournament.event.start_time - timedelta(minutes=c.SMS_REMINDER_MINUTES)
 
     def matches(self, message):
         sent = message.date_sent.replace(tzinfo=UTC)
-        return normalized(self.attendee.cellphone) == message.from_ \
+        return normalize(self.attendee.cellphone) == message.from_ \
            and self.reminder and sent > self.reminder.when \
            and sent < self.tournament.event.start_time + timedelta(minutes=c.TOURNAMENT_SLACK)
 

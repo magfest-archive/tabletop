@@ -4,7 +4,7 @@ from tabletop import *
 client = TwilioRestClient(tabletop_config['secret']['twilio_sid'], tabletop_config['secret']['twilio_token'])
 
 
-def send_sms(to, body, _from=c.TWILIO_NUMBER):
+def send_sms(to, body, from_=c.TWILIO_NUMBER):
     return client.messages.create(to=normalize(to), body=body, from_=normalize(from_))
 
 
