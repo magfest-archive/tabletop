@@ -67,6 +67,11 @@ angular.module('tabletop.tournaments', ['ngRoute', 'ui.bootstrap', 'magfest'])
                 $route.reload();
             });
         };
+        $scope.futureTournaments = function (tournament) {
+            var searchText = $scope.search || '';
+            return ($scope.showAllTournaments || tournament.when > new Date().getTime() / 1000 - 15 * 60)
+                && _(tournament.name.toLowerCase()).includes(searchText.toLowerCase());
+        };
     })
     .controller('AddTournamentController', function ($scope, $q, $location, Tournaments) {
         $scope.events = Tournaments.events;
@@ -95,4 +100,3 @@ angular.module('tabletop.tournaments', ['ngRoute', 'ui.bootstrap', 'magfest'])
             $location.path('/');
         };
     });
-

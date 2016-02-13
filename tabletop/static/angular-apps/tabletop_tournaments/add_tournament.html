@@ -6,13 +6,15 @@ than 20 characters and should NOT include the word "Tournament".
 
 <br/> <br/>
 
+<a style="display:block ; text-align:center" href="#/">Cancel</a>
+
 <table>
     <tbody>
         <tr>
             <td>Event:</td>
             <td>
                 <input type="text" size="50" ng-model="tournament.event" typeahead-editable="false"
-                                   typeahead="e as (e.name + ' (' + e.when + ')') for e in events | filter | limitTo:8" />
+                                   typeahead="e as (e.name + ' (' + e.when + ')') for e in events | filter:$viewValue | limitTo:8" />
             </td>
         </tr>
         <tr ng-if="tournament.event">

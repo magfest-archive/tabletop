@@ -7,6 +7,10 @@ class Root:
         return {'state': _state(session)}
 
     @ajax
+    def refresh(self, session):
+        return {'state': _state(session)}
+
+    @ajax
     def create_tournament(self, session, name, event_id):
         try:
             session.add(TabletopTournament(name=name, event_id=event_id))
@@ -32,6 +36,7 @@ class Root:
             session.commit()
         except:
             session.rollback()
+            log.error('unable to add tournament entrant tournament={} attendee={}', tournament_id, attendee_id, exc_info=True)
             return {'error': 'That attendee is already signed up for that tournament'}
         else:
             return {
@@ -61,7 +66,7 @@ def _events(session):
 def _attendees(session):
     return [{
         'id': id,
-        'name': name,
+        'name': name.title(),
         'badge': num,
         'cellphone': cellphone
     } for (id, name, num, cellphone) in session.query(Attendee.id, Attendee.full_name, Attendee.badge_num, Attendee.cellphone)
@@ -73,13 +78,14 @@ def _tournaments(session):
     return [{
         'id': t.id,
         'name': t.name,
-        'when': t.event.start_time_local.strftime('%-I:%M %p %A'),
+        'when': t.event.start_time_local.timestamp(),
+        'when_display': t.event.start_time_local.strftime('%-I:%M %p %A'),
         'entrants': [{
             'id': te.attendee_id,
             'name': te.attendee.full_name,
             'badge': te.attendee.badge_num,
             'confirmed': te.confirmed
-        } for te in t.entrants]
+        } for te in sorted(t.entrants, key=lambda e: e.signed_up)]
     } for t in session.query(TabletopTournament)
                       .options(joinedload(TabletopTournament.event),
                                subqueryload(TabletopTournament.entrants).subqueryload(TabletopEntrant.attendee))

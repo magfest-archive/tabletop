@@ -4,23 +4,28 @@
 
 <h4>Tournaments</h4>
 
+<input type="checkbox" ng-model="showAllTournaments" /> Show old tournaments
+<br/> Filter tournaments: <input type="text" ng-model="search" />
+
 <table>
     <tbody>
-        <tr ng-repeat="tournament in tournaments">
+        <tr ng-repeat="tournament in tournaments | filter:futureTournaments">
             <td>
-                <b>{{ tournament.name }}</b>
+                <b>{{ tournament.name }} ({{ tournament.when_display }})</b>
                 <br/> <br>
                 <b>{{ tournament.entrants.length }}</b> entrants
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" ng-model="onlyConfirmed" /> Show only confirmed
                 <ol>
-                    <li ng-repeat="entrant in tournament.entrants">
-                        {{ entrant.name }} (Badge #{{ entrant.badge }})
+                    <li ng-repeat="entrant in tournament.entrants" ng-if="!onlyConfirmed || entrant.confirmed">
+                        <span ng-if="entrant.confirmed">(Confirmed)</span> {{ entrant.name }} (Badge #{{ entrant.badge }})
                     </li>
                 </ol>
             </td>
             <td>
                 Add an attendee:
-                <input type="text" ng-model="attendee" typeahead-editable="false"
-                       typeahead="a as (a.name + ' (Badge #' + a.badge + ')') for a in attendees | filter | limitTo:8" />
+                <input type="text" ng-model="attendee" typeahead-editable="false" style="width:30ex"
+                       typeahead="a as (a.name + ' (Badge #' + a.badge + ')') for a in attendees | filter:$viewValue | limitTo:5" />
             </td>
             <td>
                 <span ng-if="attendee">
@@ -32,7 +37,3 @@
         </tr>
     </tbody>
 </table>
-
-<table>
-</table>
-

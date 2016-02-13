@@ -22,14 +22,16 @@ def send_reminder_texts():
 DaemonTask(send_reminder_texts, interval=60)
 
 
-# TODO: twilio message paging
 def check_replies():
     with Session() as session:
         entrants = session.entrants_by_phone()
         existing_sids = {sid for [sid] in session.query(TabletopSmsReply.sid).all()}
         for message in client.messages.list(to=c.TWILIO_NUMBER):
+            if message.sid in existing_sids:
+                break
+
             for entrant in entrants[message.from_]:
-                if message.sid not in existing_sids and entrant.matches(message):
+                if entrant.matches(message):
                     session.add(TabletopSmsReply(
                         entrant=entrant,
                         sid=message.sid,

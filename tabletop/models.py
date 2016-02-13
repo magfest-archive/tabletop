@@ -54,7 +54,7 @@ class TabletopCheckout(MagModel):
 
 class TabletopTournament(MagModel):
     event_id = Column(UUID, ForeignKey('event.id'), unique=True)
-    name = Column(UnicodeText)  # might want a shorter name for SMS messages
+    name = Column(UnicodeText)  # separate from the event name for cases where we want a shorter name in our SMS messages
 
     entrants = relationship('TabletopEntrant', backref='tournament')
 
@@ -68,10 +68,18 @@ class TabletopEntrant(MagModel):
     reminder = relationship('TabletopSmsReminder', backref='entrant', uselist=False)
     replies = relationship('TabletopSmsReply', backref='entrant')
 
+    @presave_adjustment
+    def _within_cutoff(self):
+        if self.is_new:
+            tournament = self.tournament or self.session.tabletop_tournament(self.tournament_id)
+            if self.signed_up > tournament.event.start_time - timedelta(minutes=c.SMS_CUTOFF_MINUTES):
+                self.confirmed = True
+
     @property
     def should_send_reminder(self):
-        return not self.reminder \
+        return not self.confirmed and not self.reminder \
            and localized_now() < self.tournament.event.start_time \
+           and localized_now() > self.signed_up + timedelta(minutes=c.SMS_STAGGER_MINUTES) \
            and localized_now() > self.tournament.event.start_time - timedelta(minutes=c.SMS_REMINDER_MINUTES)
 
     def matches(self, message):
