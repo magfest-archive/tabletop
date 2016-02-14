@@ -3,6 +3,7 @@ from sqlalchemy.orm import subqueryload
 import phonenumbers
 from phonenumbers import PhoneNumberFormat
 
+from twilio import TwilioRestException
 from twilio.rest import TwilioRestClient
 
 from uber.common import *

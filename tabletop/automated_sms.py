@@ -2,15 +2,24 @@ from tabletop import *
 
 
 def send_reminder(entrant):
+    sid = 'unable to send sms'
     try:
         body = c.REMINDER_SMS.format(entrant=entrant)
         message = send_sms(entrant.attendee.cellphone, body)
-        assert not message.error_code, '{message.error_code}: {message.error_text}'.format(message=message)
-        entrant.session.add(TabletopSmsReminder(entrant=entrant, text=body, sid=message.sid))
-        entrant.session.commit()
+        if message:
+            sid = message.sid if not message.error_code else message.error_text
+    except TwilioRestException as e:
+        if e.code == 21211:  # https://www.twilio.com/docs/api/errors/21211
+            log.error('invalid cellphone number for entrant', exc_info=True)
+        else:
+            log.error('unable to send reminder SMS', exc_info=True)
+            raise
     except:
-        entrant.session.rollback()
-        log.error('Unable to send reminder sms', exc_info=True)
+        log.error('Unexpected error sending SMS', exc_info=True)
+        raise
+
+    entrant.session.add(TabletopSmsReminder(entrant=entrant, text=body, sid=sid))
+    entrant.session.commit()
 
 
 def send_reminder_texts():
@@ -18,8 +27,6 @@ def send_reminder_texts():
         for entrant in session.entrants():
             if entrant.should_send_reminder:
                 send_reminder(entrant)
-
-DaemonTask(send_reminder_texts, interval=60)
 
 
 def check_replies():
@@ -41,4 +48,6 @@ def check_replies():
                     entrant.confirmed = 'Y' in message.body.upper()
                     session.commit()
 
-DaemonTask(check_replies, interval=60)
+if client:
+    DaemonTask(check_replies, interval=60)
+    DaemonTask(send_reminder_texts, interval=60)
