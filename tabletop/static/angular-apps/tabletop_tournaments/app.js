@@ -50,6 +50,14 @@ angular.module('tabletop.tournaments', ['ngRoute', 'ui.bootstrap', 'magfest'])
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     data: $.param(pair)
                 }).then(self._handleResponse).catch(self._handleError);
+            },
+            drop: function (pair) {
+                return $http({
+                    method: 'POST',
+                    url: 'drop',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    data: $.param(pair)
+                }).then(self._handleResponse).catch(self._handleError);
             }
         };
         self.update($window.PRELOAD_DATA || {});
@@ -63,6 +71,14 @@ angular.module('tabletop.tournaments', ['ngRoute', 'ui.bootstrap', 'magfest'])
                 attendee_id: attendee.id,
                 tournament_id: tournament.id,
                 cellphone: attendee.cellphone
+            }).then(function () {
+                $route.reload();
+            });
+        };
+        $scope.drop = function (tournament, entrant) {
+            Tournaments.drop({
+                attendee_id: entrant.id,
+                tournament_id: tournament.id
             }).then(function () {
                 $route.reload();
             });
