@@ -44,6 +44,19 @@ class Root:
                 'state': _state(session)
             }
 
+    @ajax
+    def drop(self, session, attendee_id, tournament_id):
+        try:
+            session.delete(session.tabletop_entrant(attendee_id=attendee_id, tournament_id=tournament_id))
+            session.commit()
+        except:
+            log.error('unable to drop tournament entrant', exc_info=True)
+
+        return {
+            'message': 'Entrant dropped; if re-added they will be re-texted',
+            'state': _state(session)
+        }
+
 
 def _state(session):
     return {
@@ -81,7 +94,7 @@ def _tournaments(session):
         'when': t.event.start_time_local.timestamp(),
         'when_display': t.event.start_time_local.strftime('%-I:%M %p %A'),
         'entrants': [{
-            'id': te.attendee_id,
+            'id': te.attendee_id,  # TODO: use entrant.id and entrant.attendee_id instead
             'name': te.attendee.full_name,
             'badge': te.attendee.badge_num,
             'confirmed': te.confirmed
