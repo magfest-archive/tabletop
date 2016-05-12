@@ -2,9 +2,16 @@ from tabletop import *
 
 # TODO: automatically merge [secret] plugin config with secret config options in global c object
 try:
-    client = TwilioRestClient(tabletop_config['secret']['twilio_sid'], tabletop_config['secret']['twilio_token'])
+    twilio_sid = tabletop_config['secret']['twilio_sid']
+    twilio_token = tabletop_config['secret']['twilio_token']
+    client = None
+
+    if twilio_sid and twilio_token:
+        client = TwilioRestClient(twilio_sid, twilio_token)
+    else:
+        log.warning('twilio: sid and/or token is not in INI, not going to try to start twilio')
 except:
-    log.error('unable to initialize twilio rest client; you probably need to set the sid / token', exc_info=True)
+    log.error('twilio: unable to initialize twilio REST client', exc_info=True)
     client = None
 
 
