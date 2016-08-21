@@ -23,6 +23,9 @@ def send_reminder(entrant):
 
 
 def send_reminder_texts():
+    if not twilio_client:
+        return
+
     with Session() as session:
         for entrant in session.entrants():
             if entrant.should_send_reminder:
@@ -30,10 +33,13 @@ def send_reminder_texts():
 
 
 def check_replies():
+    if not twilio_client:
+        return
+
     with Session() as session:
         entrants = session.entrants_by_phone()
         existing_sids = {sid for [sid] in session.query(TabletopSmsReply.sid).all()}
-        for message in client.messages.list(to=c.TWILIO_NUMBER):
+        for message in twilio_client.messages.list(to=c.TWILIO_NUMBER):
             if message.sid in existing_sids:
                 break
 
@@ -48,6 +54,5 @@ def check_replies():
                     entrant.confirmed = 'Y' in message.body.upper()
                     session.commit()
 
-if client:
-    DaemonTask(check_replies, interval=60)
-    DaemonTask(send_reminder_texts, interval=60)
+DaemonTask(check_replies, interval=60,          name="sms_chk_replies")
+DaemonTask(send_reminder_texts, interval=60,    name="sms_send_remind")

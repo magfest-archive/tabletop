@@ -1,18 +1,23 @@
 from tabletop import *
 
-# TODO: automatically merge [secret] plugin config with secret config options in global c object
-try:
-    twilio_sid = tabletop_config['secret']['twilio_sid']
-    twilio_token = tabletop_config['secret']['twilio_token']
-    client = None
+twilio_client = None
 
-    if twilio_sid and twilio_token:
-        client = TwilioRestClient(twilio_sid, twilio_token)
-    else:
-        log.warning('twilio: sid and/or token is not in INI, not going to try to start twilio')
-except:
-    log.error('twilio: unable to initialize twilio REST client', exc_info=True)
-    client = None
+
+# TODO: automatically merge [secret] plugin config with secret config options in global c object
+def initialize_twilio():
+    try:
+        twilio_sid = tabletop_config['secret']['twilio_sid']
+        twilio_token = tabletop_config['secret']['twilio_token']
+
+        if twilio_sid and twilio_token:
+            twilio_client = TwilioRestClient(twilio_sid, twilio_token)
+        else:
+            log.debug('Twilio SID and/or TOKEN is not in INI, not going to try to start Twilio for SMS messaging')
+    except:
+        log.error('twilio: unable to initialize twilio REST client', exc_info=True)
+        twilio_client = None
+
+on_startup(initialize_twilio, priority=49)
 
 
 def normalize(phone_number):
@@ -21,9 +26,9 @@ def normalize(phone_number):
 
 def send_sms(to, body, from_=c.TWILIO_NUMBER):
     to = normalize(to)
-    if not client:
+    if not twilio_client:
         log.error('no twilio client configured')
     elif c.DEV_BOX and to not in c.TEST_NUMBERS:
         log.info('We are in dev box mode, so we are not sending {!r} to {!r}', body, to)
     else:
-        return client.messages.create(to=to, body=body, from_=normalize(from_))
+        return twilio_client.messages.create(to=to, body=body, from_=normalize(from_))
