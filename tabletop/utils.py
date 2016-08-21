@@ -2,6 +2,7 @@ from tabletop import *
 
 twilio_client = None
 
+
 # TODO: automatically merge [secret] plugin config with secret config options in global c object
 def initialize_twilio():
     try:
@@ -17,6 +18,7 @@ def initialize_twilio():
         twilio_client = None
 
 on_startup(initialize_twilio, priority=49)
+
 
 def normalize(phone_number):
     return phonenumbers.format_number(phonenumbers.parse(phone_number, c.PHONE_COUNTRY), PhoneNumberFormat.E164)
