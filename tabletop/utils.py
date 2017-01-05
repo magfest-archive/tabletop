@@ -5,6 +5,7 @@ twilio_client = None
 
 # TODO: automatically merge [secret] plugin config with secret config options in global c object
 def initialize_twilio():
+    global twilio_client
     try:
         twilio_sid = tabletop_config['secret']['twilio_sid']
         twilio_token = tabletop_config['secret']['twilio_token']
