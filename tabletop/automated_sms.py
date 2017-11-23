@@ -1,4 +1,5 @@
 from tabletop import *
+import uber.scheduler
 
 
 def send_reminder(entrant):
@@ -54,5 +55,6 @@ def check_replies():
                     entrant.confirmed = 'Y' in message.body.upper()
                     session.commit()
 
-DaemonTask(check_replies, interval=60,          name="sms_chk_replies")
-DaemonTask(send_reminder_texts, interval=60,    name="sms_send_remind")
+
+uber.scheduler.schedule.every(1).minutes.do(check_replies)
+uber.scheduler.schedule.every(1).minutes.do(send_reminder_texts)
