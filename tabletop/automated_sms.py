@@ -56,5 +56,12 @@ def check_replies():
                     session.commit()
 
 
-uber.scheduler.schedule.every(1).minutes.do(check_replies)
-uber.scheduler.schedule.every(1).minutes.do(send_reminder_texts)
+uber.scheduler.register_task(
+    fn=lambda: uber.scheduler.schedule.every(1).minutes.do(check_replies),
+    category="sms_service"
+)
+
+uber.scheduler.register_task(
+    fn=lambda: uber.scheduler.schedule.every(1).minutes.do(send_reminder_texts),
+    category="sms_service"
+)
