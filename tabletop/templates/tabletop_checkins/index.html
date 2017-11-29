@@ -15,8 +15,10 @@
                 $http.defaults.headers.common = {'CSRF-Token': '{{ c.CSRF_TOKEN }}'};
             });
     </script>
+
 </head>
 <body ng-app="tabletop.checkins">
+    {% include "tabletop_common.html" %}
     <div ng-controller="MainController">
         <div ng-view></div>
     </div>
