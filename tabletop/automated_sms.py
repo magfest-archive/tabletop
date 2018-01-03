@@ -1,3 +1,6 @@
+from http.client import BadStatusLine
+from requests.exceptions import ConnectionError
+
 from tabletop import *
 
 
@@ -39,9 +42,24 @@ def check_replies():
     with Session() as session:
         entrants = session.entrants_by_phone()
         existing_sids = {sid for [sid] in session.query(TabletopSmsReply.sid).all()}
-        for message in twilio_client.messages.list(to=c.TWILIO_NUMBER):
+        messages = []
+
+        # Pull all the messages down before attempting to act on them. The new
+        # twilio client uses a streaming mode, so the stream might be timing
+        # out while it waits for us to act on each message inside our loop.
+        try:
+            messages = [m for m in twilio_client.messages.list(to=c.TWILIO_NUMBER)]
+        except ConnectionError as ex:
+            if ex.errno == 'Connection aborted.' \
+                    and isinstance(ex.strerror, BadStatusLine) \
+                    and ex.strerror.line == "''":
+                log.warning('Twilio connection closed unexpectedly')
+            else:
+                raise ex
+
+        for message in messages:
             if message.sid in existing_sids:
-                break
+                continue
 
             for entrant in entrants[message.from_]:
                 if entrant.matches(message):
