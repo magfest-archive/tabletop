@@ -58,3 +58,5 @@ def check_replies():
 if c.SEND_SMS:
     DaemonTask(check_replies, interval=120, name="sms_chk_replies")
     DaemonTask(send_reminder_texts, interval=120, name="sms_send_remind")
+else:
+    log.info('SMS DISABLED for tabletop')
