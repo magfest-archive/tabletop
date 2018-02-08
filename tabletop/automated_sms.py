@@ -7,7 +7,7 @@ from tabletop import *
 def send_reminder(entrant):
     sid = 'unable to send sms'
     try:
-        body = c.REMINDER_SMS.format(entrant=entrant)
+        body = c.TABLETOP_REMINDER_SMS.format(entrant=entrant)
         message = send_sms(entrant.attendee.cellphone, body)
         if message:
             sid = message.sid if not message.error_code else message.error_text
@@ -48,7 +48,7 @@ def check_replies():
         # twilio client uses a streaming mode, so the stream might be timing
         # out while it waits for us to act on each message inside our loop.
         try:
-            messages = [m for m in twilio_client.messages.list(to=c.TWILIO_NUMBER)]
+            messages = [m for m in twilio_client.messages.list(to=c.TABLETOP_TWILIO_NUMBER)]
         except ConnectionError as ex:
             if ex.errno == 'Connection aborted.' \
                     and isinstance(ex.strerror, BadStatusLine) \
